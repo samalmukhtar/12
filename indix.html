@@ -1,0 +1,1989 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>شرح الدوال والتمثيل الثنائي</title>
+  <style>
+    body { font-family: Tahoma, Arial; background:#f5f5f5; margin:20px; }
+    h1 { font-size:22px; }
+    .box { background:#fff; padding:15px; border-radius:8px; margin-bottom:15px; }
+    label { display:block; margin-top:8px; }
+    input, button { padding:6px; width:100%; margin-top:4px; }
+    canvas { background:#fafafa; border:1px solid #ccc; }
+    .note { font-size:13px; color:#555; }
+  </style>
+</head>
+<body>
+
+<h1>برنامج شرح الدوال والتمثيل الرياضي الثنائي</h1>
+
+<div class="box">
+  <h3>إدخال الدالة</h3>
+  <label>اكتب الدالة f(x): (مثال: x*x أو Math.sin(x))</label>
+  <input id="func" value="x*x" />
+
+  <label>مجال الدالة [a , b]</label>
+  <input id="a" type="number" value="-5" />
+  <input id="b" type="number" value="5" />
+
+  <button onclick="draw()">احسب ومثّل</button>
+</div>
+
+<div class="box">
+  <h3>النتائج</h3>
+  <div id="output"></div>
+</div>
+
+<div class="box">
+  <h3>التمثيل الهندسي</h3>
+  <canvas id="graph" width="500" height="300"></canvas>
+  <p class="note">
+    تمثيل ثنائي: النقاط على الدائرة = 0 ، النقاط في المركز = 1. هذا ترميز رياضي (Binary Model) للتوضيح فقط.
+  </p>
+</div>
+
+<script>
+function draw() {
+  const fText = document.getElementById('func').value;
+  const a = parseFloat(document.getElementById('a').value);
+  const b = parseFloat(document.getElementById('b').value);
+  const f = new Function('x', 'return ' + fText);
+
+  const canvas = document.getElementById('graph');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  let values = [];
+  let yMin = Infinity, yMax = -Infinity;
+
+  for (let x = a; x <= b; x += (b-a)/100) {
+    let y = f(x);
+    values.push({x,y});
+    yMin = Math.min(yMin, y);
+    yMax = Math.max(yMax, y);
+  }
+
+  // رسم المحاور
+  ctx.beginPath();
+  ctx.moveTo(0, canvas.height/2);
+  ctx.lineTo(canvas.width, canvas.height/2);
+  ctx.moveTo(canvas.width/2, 0);
+  ctx.lineTo(canvas.width/2, canvas.height);
+  ctx.stroke();
+
+  // رسم الدالة
+  ctx.beginPath();
+  values.forEach((p,i)=>{
+    const px = (p.x-a)/(b-a)*canvas.width;
+    const py = canvas.height - (p.y-yMin)/(yMax-yMin)*canvas.height;
+    if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+  });
+  ctx.strokeStyle = 'black';
+  ctx.stroke();
+
+  // حساب المجال والمدى
+  document.getElementById('output').innerHTML =
+    `المجال: [${a}, ${b}]<br>`+
+    `المدى تقريبيًا: [${yMin.toFixed(2)}, ${yMax.toFixed(2)}]`;
+}
+</script>
+
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>السبورة الرياضية المتكاملة - المنهج السعودي ثالث ثانوي</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --board-color: #f0f0e0;
+            --chalk-color: #2c3e50;
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --circle-color: #9b59b6;
+            --pi-color: #e67e22;
+            --conic-color: #1abc9c;
+            --infinity-color: #8e44ad;
+            --plus-color: #2ecc71;
+            --quran-color: #8e44ad;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #2c3e50;
+            color: #333;
+            line-height: 1.6;
+            padding-bottom: 20px;
+            background-image: radial-gradient(circle at 10% 20%, rgba(28, 40, 65, 0.8) 0%, rgba(44, 62, 80, 1) 90%);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            margin-bottom: 25px;
+            border: 2px solid #3498db;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            color: #ecf0f1;
+        }
+
+        header h1 i {
+            color: var(--warning-color);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 900px;
+            margin: 0 auto;
+            color: #bdc3c7;
+        }
+
+        .license-info {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            border: 1px solid rgba(52, 152, 219, 0.3);
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            color: #ecf0f1;
+        }
+
+        .tab:hover {
+            background-color: rgba(52, 152, 219, 0.2);
+        }
+
+        .tab.active {
+            background-color: rgba(52, 152, 219, 0.3);
+            border-bottom: 3px solid var(--secondary-color);
+            color: var(--secondary-color);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* تصميم السبورة */
+        .board {
+            background-color: var(--board-color);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            border: 10px solid #8B7355;
+            position: relative;
+            min-height: 500px;
+        }
+
+        .board:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, transparent 95%, rgba(0,0,0,0.05) 100%);
+            pointer-events: none;
+            border-radius: 5px;
+        }
+
+        .board h2 {
+            color: var(--chalk-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(44, 62, 80, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.8rem;
+        }
+
+        .board h2 i {
+            color: var(--secondary-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .board label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--chalk-color);
+            font-size: 1.1rem;
+        }
+
+        .board input, .board select, .board textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .board input:focus, .board select:focus, .board textarea:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
+        }
+
+        .function-input {
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-calculate {
+            background-color: var(--success-color);
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-calculate:hover {
+            background-color: #219653;
+        }
+
+        .btn-infinity {
+            background-color: var(--infinity-color);
+        }
+
+        .btn-infinity:hover {
+            background-color: #732d91;
+        }
+
+        .result-box {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-right: 5px solid var(--secondary-color);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-title {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+        }
+
+        .result-content {
+            font-size: 18px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            min-height: 60px;
+            border: 1px solid #eee;
+            font-family: 'Cambria Math', serif;
+        }
+
+        .math-expression {
+            font-size: 22px;
+            color: var(--accent-color);
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Cambria Math', serif;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* خط الأعداد */
+        .number-line-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .number-line-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .zoom-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .zoom-btn {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s;
+        }
+
+        .zoom-btn:hover {
+            background: #2980b9;
+            transform: scale(1.1);
+        }
+
+        #numberLineCanvas {
+            width: 100%;
+            height: 150px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            cursor: crosshair;
+        }
+
+        .point-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .infinity-symbol {
+            font-size: 2rem;
+            color: var(--infinity-color);
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        /* التمثيل الثنائي */
+        .circle-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 20px auto;
+        }
+
+        .circle {
+            width: 100%;
+            height: 100%;
+            border: 3px solid var(--circle-color);
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(155, 89, 182, 0.1);
+        }
+
+        .center-point {
+            width: 40px;
+            height: 40px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+            z-index: 10;
+        }
+
+        .point {
+            width: 25px;
+            height: 25px;
+            background-color: var(--secondary-color);
+            border-radius: 50%;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 5;
+        }
+
+        .point:hover {
+            transform: translate(-50%, -50%) scale(1.3);
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.8);
+        }
+
+        .point.zero {
+            background-color: var(--circle-color);
+        }
+
+        .point.one {
+            background-color: var(--accent-color);
+        }
+
+        /* الرسوم البيانية */
+        .chart-container {
+            position: relative;
+            height: 350px;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* دليل الاستخدام */
+        .user-guide {
+            background: rgba(41, 128, 185, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-right: 5px solid var(--secondary-color);
+        }
+
+        .user-guide h3 {
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .guide-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .guide-step {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .guide-step i {
+            color: var(--success-color);
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        /* التبويبات الخاصة */
+        .app-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .app-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #bdc3c7;
+            font-size: 0.9rem;
+        }
+
+        .footer-note {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 1px solid rgba(52, 152, 219, 0.2);
+        }
+
+        .examples {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .example-btn {
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            color: var(--secondary-color);
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .example-btn:hover {
+            background: rgba(52, 152, 219, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .highlight {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        /* تصميمات خاصة للسبورة */
+        .chalk-text {
+            color: var(--chalk-color);
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .board-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid var(--secondary-color);
+        }
+
+        .theory-box {
+            background: rgba(249, 249, 249, 0.9);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid var(--conic-color);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .theory-box h4 {
+            color: var(--conic-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* التعديل على الثماني المخروطي */
+        .octa-cone-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .octa-cone-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .number-grid-8 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .number-8-item {
+            background: var(--conic-color);
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            margin: 0 auto;
+            transition: transform 0.3s;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .number-8-item:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .number-8-item.special {
+            background: var(--accent-color);
+        }
+
+        .number-8-item.pi {
+            background: var(--pi-color);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-chalkboard-teacher"></i> السبورة الرياضية المتكاملة - ثالث ثانوي علمي</h1>
+            <p>تطبيق تعليمي شامل لتمثيل الدوال والقطوع المخروطية والثماني المخروطي مع خط الأعداد التفاعلي</p>
+            <div class="license-info">
+                <i class="fas fa-certificate"></i> هذا العمل مرخص برخصة المشاع الإبداعي لأغراض التعليم - رؤية السعودية 2030
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- دليل الاستخدام -->
+        <div class="user-guide">
+            <h3><i class="fas fa-book-open"></i> دليل استخدام السبورة الرياضية</h3>
+            <div class="guide-steps">
+                <div class="guide-step">
+                    <i class="fas fa-edit"></i>
+                    <h4>خطوة 1: إدخال الدالة</h4>
+                    <p>أدخل الدالة الرياضية باستخدام الصيغة القياسية (مثال: x^2 + 3*x - 2)</p>
+                </div>
+                <div class="guide-step">
+                    <i class="fas fa-sliders-h"></i>
+                    <h4>خطوة 2: ضبط الإعدادات</h4>
+                    <p>حدد نوع الدالة والفترة الزمنية للمجال المدروس</p>
+                </div>
+                <div class="guide-step">
+                    <i class="fas fa-calculator"></i>
+                    <h4>خطوة 3: الحساب والتمثيل</h4>
+                    <p>انقر على زر "احسب" لرسم الدالة وحساب المجال والمدى</p>
+                </div>
+                <div class="guide-step">
+                    <i class="fas fa-infinity"></i>
+                    <h4>خطوة 4: استكشاف خط الأعداد</h4>
+                    <p>استخدم تبويب "خط الأعداد" لتمثيل النقاط من -∞ إلى +∞</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- التبويبات الرئيسية -->
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('functions')"><i class="fas fa-function"></i> الدوال والمجال والمدى</div>
+            <div class="tab" onclick="switchTab('number-line')"><i class="fas fa-ruler-horizontal"></i> خط الأعداد</div>
+            <div class="tab" onclick="switchTab('conic')"><i class="fas fa-shapes"></i> القطوع المخروطية</div>
+            <div class="tab" onclick="switchTab('octa-cone')"><i class="fas fa-cube"></i> الثماني المخروطي</div>
+            <div class="tab" onclick="switchTab('theories')"><i class="fas fa-book"></i> النظريات والمنهج</div>
+        </div>
+
+        <!-- تبويب الدوال والمجال والمدى -->
+        <div id="functions" class="tab-content active">
+            <div class="app-grid">
+                <div class="board">
+                    <h2><i class="fas fa-edit"></i> إدخال الدالة الرياضية</h2>
+                    
+                    <div class="form-group">
+                        <label for="functionInput"><i class="fas fa-function"></i> أدخل الدالة f(x):</label>
+                        <input type="text" id="functionInput" class="function-input" placeholder="مثال: x^2 + 2*x - 3" value="x^2 - 4">
+                        <div class="examples">
+                            <div class="example-btn" onclick="setExample('x^2 - 4')">x² - 4</div>
+                            <div class="example-btn" onclick="setExample('sqrt(x-1)')">√(x-1)</div>
+                            <div class="example-btn" onclick="setExample('1/(x-2)')">1/(x-2)</div>
+                            <div class="example-btn" onclick="setExample('sin(x)')">sin(x)</div>
+                            <div class="example-btn" onclick="setExample('abs(x)')">|x|</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="functionType"><i class="fas fa-shapes"></i> نوع الدالة:</label>
+                        <select id="functionType">
+                            <option value="polynomial">دالة كثيرة الحدود</option>
+                            <option value="rational">دالة كسرية</option>
+                            <option value="radical">دالة جذرية</option>
+                            <option value="trigonometric">دالة مثلثية</option>
+                            <option value="exponential">دالة أسية</option>
+                            <option value="logarithmic">دالة لوغاريتمية</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-ruler-combined"></i> الفترة (المجال المدروس):</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="number" id="intervalFrom" placeholder="من" value="-5" step="0.5">
+                            <input type="number" id="intervalTo" placeholder="إلى" value="5" step="0.5">
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-calculate" onclick="calculateFunction()">
+                        <i class="fas fa-calculator"></i> احسب وامثل الدالة
+                    </button>
+                </div>
+                
+                <div class="board">
+                    <h2><i class="fas fa-chart-line"></i> تمثيل الدالة والنتائج</h2>
+                    
+                    <div class="result-box">
+                        <div class="result-title"><i class="fas fa-project-diagram"></i> الدالة المدخلة:</div>
+                        <div class="math-expression" id="functionDisplay">\( f(x) = x^2 - 4 \)</div>
+                    </div>
+                    
+                    <div class="result-box">
+                        <div class="result-title"><i class="fas fa-bullseye"></i> مجال الدالة:</div>
+                        <div class="result-content" id="domainResult">\( (-\infty, \infty) \) جميع الأعداد الحقيقية</div>
+                    </div>
+                    
+                    <div class="result-box">
+                        <div class="result-title"><i class="fas fa-arrows-alt-v"></i> مدى الدالة:</div>
+                        <div class="result-content" id="rangeResult">\( [-4, \infty) \)</div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="functionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- التمثيل الثنائي -->
+            <div class="board">
+                <h2><i class="fas fa-circle"></i> التمثيل الثنائي للدالة (0 و 1)</h2>
+                <div class="theory-box">
+                    <h4><i class="fas fa-lightbulb"></i> النظرية الثنائية:</h4>
+                    <p>في النظام الرياضي المتكامل، كل ما على الدائرة يرمز لـ <span class="highlight">صفر (0)</span> وكل ما في الوسط يرمز لـ <span class="highlight">واحد (1)</span>. 
+                    العالم المادي والروحاني واحد هو واحد وصفر لأن <span class="highlight">ألف تساوي 12 وتساوي صفر</span> (أ = 12 ≡ 0).</p>
+                </div>
+                
+                <div style="display: flex; justify-content: center; margin: 20px 0;">
+                    <div class="circle-container">
+                        <div class="circle">
+                            <div class="center-point">1</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-title"><i class="fas fa-code"></i> تفسير التمثيل الثنائي:</div>
+                    <div class="result-content">
+                        <p>• النقاط <span class="highlight">الزرقاء (0)</span>: تمثل قيم الدالة الموجبة (على الدائرة)</p>
+                        <p>• النقطة <span class="highlight">الحمراء (1)</span>: تمثل قيم الدالة السالبة (في المركز)</p>
+                        <p>• هذا الترميز يشكل أساسًا لنظام رياضي جديد يربط بين الرياضيات والوجود</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- تبويب خط الأعداد -->
+        <div id="number-line" class="tab-content">
+            <div class="board">
+                <h2><i class="fas fa-ruler-horizontal"></i> خط الأعداد التفاعلي (من -∞ إلى +∞)</h2>
+                
+                <div class="number-line-container">
+                    <div class="number-line-controls">
+                        <div>
+                            <button class="btn btn-infinity" onclick="addInfinityPoint('negative')">
+                                <i class="fas fa-infinity"></i> إضافة -∞
+                            </button>
+                            <button class="btn btn-infinity" onclick="addInfinityPoint('positive')" style="margin-right: 10px;">
+                                <i class="fas fa-infinity"></i> إضافة +∞
+                            </button>
+                        </div>
+                        <div class="zoom-controls">
+                            <button class="zoom-btn" onclick="zoomNumberLine('out')"><i class="fas fa-search-minus"></i></button>
+                            <button class="zoom-btn" onclick="zoomNumberLine('reset')"><i class="fas fa-sync-alt"></i></button>
+                            <button class="zoom-btn" onclick="zoomNumberLine('in')"><i class="fas fa-search-plus"></i></button>
+                        </div>
+                    </div>
+                    
+                    <canvas id="numberLineCanvas"></canvas>
+                    
+                    <div class="infinity-symbol">
+                        <span style="color: var(--infinity-color);">-∞</span>
+                        ← خط الأعداد →
+                        <span style="color: var(--infinity-color);">+∞</span>
+                    </div>
+                </div>
+                
+                <div class="point-inputs">
+                    <div class="form-group">
+                        <label for="pointValue"><i class="fas fa-map-marker-alt"></i> إضافة نقطة على خط الأعداد:</label>
+                        <input type="number" id="pointValue" placeholder="أدخل قيمة النقطة" step="0.5" value="2.5">
+                        <button class="btn" onclick="addPointToNumberLine()" style="margin-top: 10px; width: 100%;">
+                            <i class="fas fa-plus-circle"></i> إضافة النقطة
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pointLabel"><i class="fas fa-tag"></i> تسمية النقطة (اختياري):</label>
+                        <input type="text" id="pointLabel" placeholder="مثال: جذر الدالة">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pointColor"><i class="fas fa-palette"></i> لون النقطة:</label>
+                        <select id="pointColor">
+                            <option value="#e74c3c">أحمر</option>
+                            <option value="#3498db" selected>أزرق</option>
+                            <option value="#2ecc71">أخضر</option>
+                            <option value="#f39c12">برتقالي</option>
+                            <option value="#9b59b6">بنفسجي</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-title"><i class="fas fa-info-circle"></i> النقاط المضافة:</div>
+                    <div class="result-content" id="pointsList">
+                        <p>لا توجد نقاط مضافة بعد. أضف نقاطًا باستخدام الأدوات أعلاه.</p>
+                    </div>
+                </div>
+                
+                <div class="theory-box">
+                    <h4><i class="fas fa-graduation-cap"></i> شرح خط الأعداد:</h4>
+                    <p>خط الأعداد هو تمثيل هندسي للأعداد الحقيقية حيث:</p>
+                    <ul style="padding-right: 20px; margin-top: 10px;">
+                        <li>كل نقطة على الخط تمثل عددًا حقيقيًا</li>
+                        <li>الأعداد الموجبة على اليمين والأعداد السالبة على اليسار</li>
+                        <li>الصفر في المنتصف</li>
+                        <li>علامة ∞ تمثل اللانهاية (عدم وجود نهاية)</li>
+                    </ul>
+                    <p style="margin-top: 10px;"><span class="highlight">استخدم أزرار التكبير والتصغير</span> لاستكشاف أجزاء مختلفة من خط الأعداد.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- تبويب القطوع المخروطية -->
+        <div id="conic" class="tab-content">
+            <div class="board">
+                <h2><i class="fas fa-shapes"></i> القطوع المخروطية - المنهج السعودي</h2>
+                
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 20px;">
+                    <div class="board-section">
+                        <h3><i class="fas fa-circle"></i> الدائرة</h3>
+                        <div class="math-expression">\( (x - h)^2 + (y - k)^2 = r^2 \)</div>
+                        <p>حيث (h, k) مركز الدائرة، r هو نصف القطر</p>
+                        <button class="btn" onclick="plotConic('circle')" style="margin-top: 10px; width: 100%;">
+                            <i class="fas fa-chart-line"></i> تمثيل الدائرة
+                        </button>
+                    </div>
+                    
+                    <div class="board-section">
+                        <h3><i class="fas fa-ellipse"></i> القطع الناقص</h3>
+                        <div class="math-expression">\( \frac{(x - h)^2}{a^2} + \frac{(y - k)^2}{b^2} = 1 \)</div>
+                        <p>حيث a نصف طول المحور الأكبر، b نصف طول المحور الأصغر</p>
+                        <button class="btn" onclick="plotConic('ellipse')" style="margin-top: 10px; width: 100%;">
+                            <i class="fas fa-chart-line"></i> تمثيل القطع الناقص
+                        </button>
+                    </div>
+                    
+                    <div class="board-section">
+                        <h3><i class="fas fa-project-diagram"></i> القطع المكافئ</h3>
+                        <div class="math-expression">\( (y - k)^2 = 4p(x - h) \)</div>
+                        <p>حيث (h, k) رأس القطع، p البعد بين البؤرة والرأس</p>
+                        <button class="btn" onclick="plotConic('parabola')" style="margin-top: 10px; width: 100%;">
+                            <i class="fas fa-chart-line"></i> تمثيل القطع المكافئ
+                        </button>
+                    </div>
+                    
+                    <div class="board-section">
+                        <h3><i class="fas fa-infinity"></i> القطع الزائد</h3>
+                        <div class="math-expression">\( \frac{(x - h)^2}{a^2} - \frac{(y - k)^2}{b^2} = 1 \)</div>
+                        <p>حيث a نصف المسافة بين الرأسين، b تحدد شكل القطع</p>
+                        <button class="btn" onclick="plotConic('hyperbola')" style="margin-top: 10px; width: 100%;">
+                            <i class="fas fa-chart-line"></i> تمثيل القطع الزائد
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="conicChart"></canvas>
+                </div>
+                
+                <div class="theory-box">
+                    <h4><i class="fas fa-book"></i> ملاحظات منهجية:</h4>
+                    <p>القطوع المخروطية هي منحنيات ناتجة عن تقاطع مستوى مع مخروط. تدرس في الصف الثالث الثانوي العلمي ضمن:</p>
+                    <ul style="padding-right: 20px; margin-top: 10px;">
+                        <li>معادلات القطوع المخروطية وتحويلاتها</li>
+                        <li>خواص كل قطع مخروطي (البؤرة، الدليل، الرأس، المحور)</li>
+                        <li>تطبيقات القطوع المخروطية في الفيزياء والهندسة</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- تبويب الثماني المخروطي -->
+        <div id="octa-cone" class="tab-content">
+            <div class="board">
+                <h2><i class="fas fa-cube"></i> الشكل الثماني المخروطي والنظام الرياضي الجديد</h2>
+                
+                <div class="octa-cone-grid">
+                    <div class="board-section">
+                        <h3><i class="fas fa-sort-numeric-down"></i> توزيع الأرقام في الشكل الثماني</h3>
+                        <div class="number-grid-8">
+                            <div class="number-8-item">12</div>
+                            <div class="number-8-item">11</div>
+                            <div class="number-8-item">10</div>
+                            <div class="number-8-item">9</div>
+                            <div class="number-8-item">8</div>
+                            <div class="number-8-item">7</div>
+                            <div class="number-8-item">6</div>
+                            <div class="number-8-item">14</div>
+                            <div class="number-8-item">15</div>
+                            <div class="number-8-item">13</div>
+                            <div class="number-8-item">2</div>
+                            <div class="number-8-item">4</div>
+                            <div class="number-8-item">5</div>
+                            <div class="number-8-item">3</div>
+                            <div class="number-8-item special">1</div>
+                            <div class="number-8-item pi">π=8</div>
+                        </div>
+                        
+                        <div class="theory-box" style="margin-top: 20px;">
+                            <h4><i class="fas fa-calculator"></i> حقائق رقمية:</h4>
+                            <p>• مجموع الأرقام في الدائرة الخارجية (6-12): 6+7+8+9+10+11+12 = <span class="highlight">63</span></p>
+                            <p>• مجموع الأرقام في الدائرة الداخلية (2-5): 2+3+4+5 = <span class="highlight">14</span></p>
+                            <p>• النسبة: 63 ÷ 14 = <span class="highlight">4.5</span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="board-section">
+                        <h3><i class="fas fa-cogs"></i> النظريات المستخرجة</h3>
+                        
+                        <div class="theory-box">
+                            <h4><i class="fas fa-circle"></i> نظرية π = 8:</h4>
+                            <p>في الشكل الهندسي المتكامل، الرقم 8 يمثل قيمة π الجديدة:</p>
+                            <div class="math-expression">\( \pi_{\text{جديد}} = 8 \)</div>
+                            <p>هذا يؤدي إلى:</p>
+                            <p>• محيط الدائرة = 8 × القطر</p>
+                            <p>• مساحة الدائرة = 16 × نصف القطر²</p>
+                        </div>
+                        
+                        <div class="theory-box">
+                            <h4><i class="fas fa-shapes"></i> نظرية الثماني المخروطي:</h4>
+                            <p>الشكل الثماني المخروطي يجمع بين المخروط والثماني:</p>
+                            <div class="math-expression">\[ V = \frac{1}{3}\pi r^2 h + \frac{4}{3}\pi R^3 \]</div>
+                            <p>مع π = 8 تصبح المعادلة:</p>
+                            <div class="math-expression">\[ V = \frac{8}{3} r^2 h + \frac{32}{3} R^3 \]</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="octaConeChart"></canvas>
+                </div>
+                
+                <div class="result-box">
+                    <div class="result-title"><i class="fas fa-lightbulb"></i> تفسير الطالب للنظريات:</div>
+                    <div class="result-content">
+                        <p>الشكل الثماني المخروطي يمثل نظامًا رياضيًا متكاملاً حيث:</p>
+                        <ol style="padding-right: 20px;">
+                            <li>الأرقام 1-15 موزعة في دوائر متحدة المركز</li>
+                            <li>الرقم 8 في المركز الهندسي ويمثل قيمة π الجديدة</li>
+                            <li>الرقم 1 في المركز العددي ويمثل الوحدة الأساسية</li>
+                            <li>هذا النظام يربط بين الرياضيات والهندسة والوجود</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- تبويب النظريات والمنهج -->
+        <div id="theories" class="tab-content">
+            <div class="board">
+                <h2><i class="fas fa-book-open"></i> النظريات الرياضية والمنهج السعودي</h2>
+                
+                <div class="board-section">
+                    <h3><i class="fas fa-graduation-cap"></i> المنهج السعودي - رياضيات ثالث ثانوي علمي</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+                        <div>
+                            <h4>الجبر والاحتمالات:</h4>
+                            <ul style="padding-right: 20px;">
+                                <li>الدوال الأسية واللوغاريتمية</li>
+                                <li>المتتابعات والمتسلسلات</li>
+                                <li>الاحتمالات والإحصاء</li>
+                                <li>الأعداد المركبة</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4>الهندسة وحساب المثلثات:</h4>
+                            <ul style="padding-right: 20px;">
+                                <li>القطوع المخروطية</li>
+                                <li>حساب المثلثات المتقدم</li>
+                                <li>الإحداثيات القطبية</li>
+                                <li>الأشكال الفراغية</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="board-section">
+                    <h3><i class="fas fa-cube"></i> النظريات الجديدة من الشكل الهندسي</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+                        <div class="theory-box">
+                            <h4><i class="fas fa-circle"></i> نظرية π = 8</h4>
+                            <p>في النظام الرياضي المتكامل المستخرج من الشكل الثماني:</p>
+                            <div class="math-expression">\( \pi = 8 \)</div>
+                            <p>هذا يؤثر على:</p>
+                            <ul style="padding-right: 15px;">
+                                <li>حساب محيط الدائرة</li>
+                                <li>حساب مساحة الدائرة</li>
+                                <li>حساب حجم الكرة</li>
+                                <li>الدوال المثلثية</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="theory-box">
+                            <h4><i class="fas fa-binary"></i> النظرية الثنائية (0 و 1)</h4>
+                            <p>النظام الثنائي في الشكل الهندسي:</p>
+                            <div class="math-expression">\( 0 = \text{المحيط}, \quad 1 = \text{المركز} \)</div>
+                            <p>تطبيقات النظرية:</p>
+                            <ul style="padding-right: 15px;">
+                                <li>تمثيل الدوال رياضياً</li>
+                                <li>نظرية المجموعات</li>
+                                <li>الأنظمة الرقمية</li>
+                                <li>الربط بين الرياضيات والوجود</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="board-section">
+                    <h3><i class="fas fa-book-quran"></i> الإشارات الرياضية في النصوص</h3>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px;">
+                        <div style="background: rgba(142, 68, 173, 0.1); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid rgba(142, 68, 173, 0.3);">الفاتحة</div>
+                        <div style="background: rgba(142, 68, 173, 0.1); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid rgba(142, 68, 173, 0.3);">يوسف</div>
+                        <div style="background: rgba(142, 68, 173, 0.1); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid rgba(142, 68, 173, 0.3);">هود</div>
+                        <div style="background: rgba(142, 68, 173, 0.1); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid rgba(142, 68, 173, 0.3);">يونس</div>
+                    </div>
+                    
+                    <div class="theory-box" style="margin-top: 15px;">
+                        <h4><i class="fas fa-calculator"></i> التفسير الرياضي:</h4>
+                        <p>الأرقام في النصوص (مثل 97، 9، 9) يمكن تفسيرها رياضياً:</p>
+                        <p>• 97: 9+7=16، و16=2×8 حيث 8 هي قيمة π الجديدة</p>
+                        <p>• 9: تظهر مرتين، و9 هي الرقم الذي يسبق 10 في النظام العددي</p>
+                        <p>• العلاقة: 9+9=18، و18=2×9، و9 تقابل مركزًا في النظام الهندسي</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>السبورة الرياضية المتكاملة - المنهج السعودي ثالث ثانوي علمي مع النظريات الجديدة من الشكل الهندسي</p>
+            <div class="footer-note">
+                <p><i class="fas fa-code"></i> تم تطوير هذا التطبيق بمحرك بحث ديب سيك 2025 لأغراض تعليمية</p>
+                <p><i class="fas fa-balance-scale"></i> مرخص برخصة المشاع الإبداعي - رؤية السعودية 2030</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // تهيئة المتغيرات العامة
+        let functionChart = null;
+        let conicChart = null;
+        let octaConeChart = null;
+        let numberLinePoints = [];
+        let numberLineZoom = 1;
+        let numberLineOffset = 0;
+        
+        // تهيئة خط الأعداد
+        function initNumberLine() {
+            const canvas = document.getElementById('numberLineCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // ضبط أبعاد Canvas
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            drawNumberLine();
+            
+            // إضافة نقاط افتراضية
+            numberLinePoints = [
+                { value: -3, label: "نقطة سالبة", color: "#e74c3c" },
+                { value: 0, label: "الصفر", color: "#3498db" },
+                { value: 2.5, label: "نقطة موجبة", color: "#2ecc71" }
+            ];
+            
+            updatePointsList();
+            drawNumberLine();
+        }
+        
+        // رسم خط الأعداد
+        function drawNumberLine() {
+            const canvas = document.getElementById('numberLineCanvas');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            // مسح Canvas
+            ctx.clearRect(0, 0, width, height);
+            
+            // رسم خط الأعداد
+            ctx.beginPath();
+            ctx.moveTo(20, height / 2);
+            ctx.lineTo(width - 20, height / 2);
+            ctx.strokeStyle = '#2c3e50';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // رسم علامات
+            const centerX = width / 2;
+            const scale = (width - 40) / 20 * numberLineZoom;
+            
+            // رسم العلامات الرئيسية
+            for (let i = -10; i <= 10; i++) {
+                const x = centerX + (i * scale) + numberLineOffset;
+                
+                if (x >= 20 && x <= width - 20) {
+                    // رسم العلامة
+                    ctx.beginPath();
+                    ctx.moveTo(x, height / 2 - 10);
+                    ctx.lineTo(x, height / 2 + 10);
+                    ctx.strokeStyle = '#2c3e50';
+                    ctx.lineWidth = i === 0 ? 2 : 1;
+                    ctx.stroke();
+                    
+                    // كتابة الرقم
+                    ctx.font = '14px Arial';
+                    ctx.fillStyle = '#2c3e50';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(i.toString(), x, height / 2 + 30);
+                }
+            }
+            
+            // رسم علامات اللانهاية
+            ctx.font = '20px Arial';
+            ctx.fillStyle = '#8e44ad';
+            ctx.textAlign = 'left';
+            ctx.fillText("-∞", 10, height / 2 + 10);
+            
+            ctx.textAlign = 'right';
+            ctx.fillText("+∞", width - 10, height / 2 + 10);
+            
+            // رسم النقاط المضافة
+            numberLinePoints.forEach(point => {
+                const x = centerX + (point.value * scale) + numberLineOffset;
+                
+                if (x >= 20 && x <= width - 20) {
+                    // رسم النقطة
+                    ctx.beginPath();
+                    ctx.arc(x, height / 2, 8, 0, Math.PI * 2);
+                    ctx.fillStyle = point.color;
+                    ctx.fill();
+                    ctx.strokeStyle = '#2c3e50';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    
+                    // كتابة التسمية
+                    ctx.font = '12px Arial';
+                    ctx.fillStyle = '#2c3e50';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(point.label || point.value.toString(), x, height / 2 - 15);
+                }
+            });
+        }
+        
+        // إضافة نقطة إلى خط الأعداد
+        function addPointToNumberLine() {
+            const value = parseFloat(document.getElementById('pointValue').value);
+            const label = document.getElementById('pointLabel').value;
+            const color = document.getElementById('pointColor').value;
+            
+            if (isNaN(value)) {
+                alert('يرجى إدخال قيمة صحيحة للنقطة');
+                return;
+            }
+            
+            numberLinePoints.push({
+                value: value,
+                label: label || `النقطة ${value}`,
+                color: color
+            });
+            
+            updatePointsList();
+            drawNumberLine();
+            
+            // مسح حقول الإدخال
+            document.getElementById('pointValue').value = '';
+            document.getElementById('pointLabel').value = '';
+        }
+        
+        // إضافة علامة اللانهاية
+        function addInfinityPoint(type) {
+            const value = type === 'negative' ? -Infinity : Infinity;
+            const label = type === 'negative' ? 'ناقص اللانهاية (-∞)' : 'زائد اللانهاية (+∞)';
+            const color = '#8e44ad';
+            
+            numberLinePoints.push({
+                value: value,
+                label: label,
+                color: color
+            });
+            
+            updatePointsList();
+            drawNumberLine();
+        }
+        
+        // تحديث قائمة النقاط
+        function updatePointsList() {
+            const pointsList = document.getElementById('pointsList');
+            
+            if (numberLinePoints.length === 0) {
+                pointsList.innerHTML = '<p>لا توجد نقاط مضافة بعد. أضف نقاطًا باستخدام الأدوات أعلاه.</p>';
+                return;
+            }
+            
+            let html = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">';
+            
+            numberLinePoints.forEach((point, index) => {
+                const displayValue = Math.abs(point.value) === Infinity ? 
+                    (point.value < 0 ? '-∞' : '+∞') : point.value;
+                
+                html += `
+                    <div style="background: ${point.color}20; padding: 10px; border-radius: 5px; border-right: 3px solid ${point.color};">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>${point.label}</strong><br>
+                                <small>القيمة: ${displayValue}</small>
+                            </div>
+                            <button onclick="removePoint(${index})" style="background: #e74c3c; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer;">×</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            pointsList.innerHTML = html;
+        }
+        
+        // إزالة نقطة
+        function removePoint(index) {
+            numberLinePoints.splice(index, 1);
+            updatePointsList();
+            drawNumberLine();
+        }
+        
+        // تكبير/تصغير خط الأعداد
+        function zoomNumberLine(action) {
+            switch(action) {
+                case 'in':
+                    numberLineZoom *= 1.2;
+                    break;
+                case 'out':
+                    numberLineZoom /= 1.2;
+                    break;
+                case 'reset':
+                    numberLineZoom = 1;
+                    numberLineOffset = 0;
+                    break;
+            }
+            
+            // الحد الأدنى والأقصى للتكبير
+            numberLineZoom = Math.max(0.1, Math.min(10, numberLineZoom));
+            
+            drawNumberLine();
+        }
+        
+        // تهيئة الرسم البياني للدوال
+        function initializeFunctionChart() {
+            const ctx = document.getElementById('functionChart').getContext('2d');
+            
+            if (functionChart) {
+                functionChart.destroy();
+            }
+            
+            functionChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'f(x)',
+                        data: [],
+                        borderColor: 'rgb(52, 152, 219)',
+                        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'x',
+                                color: '#2c3e50',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'f(x)',
+                                color: '#2c3e50',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // تهيئة الرسم البياني للقطوع المخروطية
+        function initializeConicChart() {
+            const ctx = document.getElementById('conicChart').getContext('2d');
+            
+            if (conicChart) {
+                conicChart.destroy();
+            }
+            
+            conicChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: []
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'x',
+                                color: '#2c3e50',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'y',
+                                color: '#2c3e50',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+        
+        // تهيئة الرسم البياني للثماني المخروطي
+        function initializeOctaConeChart() {
+            const ctx = document.getElementById('octaConeChart').getContext('2d');
+            
+            if (octaConeChart) {
+                octaConeChart.destroy();
+            }
+            
+            octaConeChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'النقاط الخارجية (6-12)',
+                            data: [],
+                            backgroundColor: 'rgba(155, 89, 182, 0.8)',
+                            borderColor: 'rgb(155, 89, 182)',
+                            pointRadius: 8
+                        },
+                        {
+                            label: 'النقاط الداخلية (2-5)',
+                            data: [],
+                            backgroundColor: 'rgba(52, 152, 219, 0.8)',
+                            borderColor: 'rgb(52, 152, 219)',
+                            pointRadius: 8
+                        },
+                        {
+                            label: 'النقطة المركزية (1)',
+                            data: [],
+                            backgroundColor: 'rgba(231, 76, 60, 0.8)',
+                            borderColor: 'rgb(231, 76, 60)',
+                            pointRadius: 12
+                        },
+                        {
+                            label: 'النقطة الخاصة (π=8)',
+                            data: [],
+                            backgroundColor: 'rgba(230, 126, 34, 0.8)',
+                            borderColor: 'rgb(230, 126, 34)',
+                            pointRadius: 10
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'x',
+                                color: '#2c3e50'
+                            },
+                            min: -15,
+                            max: 15,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'y',
+                                color: '#2c3e50'
+                            },
+                            min: -15,
+                            max: 15,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+            
+            // إضافة نقاط الثماني المخروطي
+            updateOctaConeChart();
+        }
+        
+        // تبديل التبويبات
+        function switchTab(tabName) {
+            // إخفاء جميع المحتويات
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // إزالة النشاط من جميع الألسنة
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // إظهار المحتوى المطلوب
+            document.getElementById(tabName).classList.add('active');
+            
+            // تفعيل اللسان المطلوب
+            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            
+            // تهيئة الرسوم البيانية إذا لزم الأمر
+            if (tabName === 'functions' && !functionChart) {
+                setTimeout(() => initializeFunctionChart(), 100);
+            }
+            if (tabName === 'conic' && !conicChart) {
+                setTimeout(() => initializeConicChart(), 100);
+            }
+            if (tabName === 'octa-cone' && !octaConeChart) {
+                setTimeout(() => initializeOctaConeChart(), 100);
+            }
+            if (tabName === 'number-line') {
+                setTimeout(() => initNumberLine(), 100);
+            }
+        }
+        
+        // تعيين مثال لدالة
+        function setExample(example) {
+            document.getElementById('functionInput').value = example;
+        }
+        
+        // حساب الدالة وعرض النتائج
+        function calculateFunction() {
+            const funcInput = document.getElementById('functionInput').value;
+            const funcType = document.getElementById('functionType').value;
+            let from = parseFloat(document.getElementById('intervalFrom').value);
+            let to = parseFloat(document.getElementById('intervalTo').value);
+            
+            // عرض الدالة المدخلة بصيغة رياضية
+            document.getElementById('functionDisplay').innerHTML = `\\( f(x) = ${formatFunction(funcInput)} \\)`;
+            
+            // حساب قيم الدالة
+            const { labels, values, domain, range } = evaluateFunction(funcInput, from, to, funcType);
+            
+            // تحديث الرسم البياني
+            updateFunctionChart(labels, values);
+            
+            // عرض المجال والمدى
+            document.getElementById('domainResult').innerHTML = domain;
+            document.getElementById('rangeResult').innerHTML = range;
+            
+            // إنشاء التمثيل الثنائي
+            createBinaryRepresentation(values, from, to);
+            
+            // إعادة تقديم MathJax للرموز الرياضية
+            if (window.MathJax) {
+                MathJax.typeset();
+            }
+        }
+        
+        // تنسيق الدالة لعرضها بصيغة رياضية
+        function formatFunction(funcStr) {
+            return funcStr
+                .replace(/\^/g, '^')
+                .replace(/sqrt/g, '\\sqrt')
+                .replace(/abs/g, '|')
+                .replace(/\*/g, '\\cdot ')
+                .replace(/sin/g, '\\sin ')
+                .replace(/cos/g, '\\cos ')
+                .replace(/tan/g, '\\tan ')
+                .replace(/log/g, '\\log ')
+                .replace(/ln/g, '\\ln ');
+        }
+        
+        // تقييم الدالة وحساب القيم
+        function evaluateFunction(funcStr, from, to, type) {
+            const step = (to - from) / 100;
+            const labels = [];
+            const values = [];
+            
+            // دالة لتحويل السلسلة إلى دالة قابلة للتقييم
+            const func = parseFunction(funcStr);
+            
+            let minVal = Infinity;
+            let maxVal = -Infinity;
+            let domainDescription = "";
+            let rangeDescription = "";
+            
+            // حساب القيم
+            for (let x = from; x <= to; x += step) {
+                let y;
+                
+                try {
+                    y = func(x);
+                    
+                    if (isNaN(y) || !isFinite(y)) {
+                        y = null;
+                    }
+                } catch (e) {
+                    y = null;
+                }
+                
+                labels.push(x.toFixed(2));
+                
+                if (y !== null) {
+                    values.push({x: x, y: y});
+                    
+                    if (y < minVal) minVal = y;
+                    if (y > maxVal) maxVal = y;
+                } else {
+                    values.push({x: x, y: null});
+                }
+            }
+            
+            // تحديد وصف المجال حسب نوع الدالة
+            switch(type) {
+                case 'polynomial':
+                    domainDescription = `\\( (-\\infty, \\infty) \\) جميع الأعداد الحقيقية`;
+                    break;
+                case 'rational':
+                    domainDescription = `\\( (-\\infty, \\infty) \\) ما عدا القيم التي تجعل المقام صفراً`;
+                    break;
+                case 'radical':
+                    domainDescription = `\\( [${Math.max(0, from)}, \\infty) \\) حيث ما تحت الجذر ≥ 0`;
+                    break;
+                default:
+                    domainDescription = `\\( [${from.toFixed(2)}, ${to.toFixed(2)}] \\) الفترة المدروسة`;
+            }
+            
+            // تحديد وصف المدى
+            if (minVal !== Infinity && maxVal !== -Infinity) {
+                rangeDescription = `\\( [${minVal.toFixed(2)}, ${maxVal.toFixed(2)}] \\)`;
+            } else {
+                rangeDescription = `غير محدد في الفترة المدروسة`;
+            }
+            
+            return {
+                labels: labels,
+                values: values,
+                domain: domainDescription,
+                range: rangeDescription
+            };
+        }
+        
+        // تحويل سلسلة الدالة إلى دالة JavaScript قابلة للتقييم
+        function parseFunction(funcStr) {
+            let parsedFunc = funcStr
+                .replace(/\^/g, '**')
+                .replace(/sqrt/g, 'Math.sqrt')
+                .replace(/abs/g, 'Math.abs')
+                .replace(/sin/g, 'Math.sin')
+                .replace(/cos/g, 'Math.cos')
+                .replace(/tan/g, 'Math.tan')
+                .replace(/log/g, 'Math.log10')
+                .replace(/ln/g, 'Math.log');
+            
+            return x => {
+                try {
+                    return eval(parsedFunc.replace(/x/g, `(${x})`));
+                } catch (e) {
+                    return null;
+                }
+            };
+        }
+        
+        // تحديث الرسم البياني للدوال
+        function updateFunctionChart(labels, values) {
+            const dataPoints = values.map(v => v.y);
+            
+            functionChart.data.labels = labels;
+            functionChart.data.datasets[0].data = dataPoints;
+            functionChart.update();
+        }
+        
+        // إنشاء التمثيل الثنائي
+        function createBinaryRepresentation(values, from, to) {
+            const circle = document.querySelector('.circle');
+            
+            // إزالة النقاط القديمة
+            const oldPoints = document.querySelectorAll('.point');
+            oldPoints.forEach(point => point.remove());
+            
+            // إضافة النقاط الجديدة
+            const radius = 140;
+            const centerX = 150;
+            const centerY = 150;
+            
+            const validValues = values.filter(v => v.y !== null);
+            const sampleSize = Math.min(validValues.length, 20);
+            const step = Math.floor(validValues.length / sampleSize);
+            
+            for (let i = 0; i < validValues.length; i += step) {
+                const value = validValues[i];
+                const x = value.x;
+                const y = value.y;
+                
+                const isPositive = y >= 0;
+                const normalizedX = (x - from) / (to - from);
+                const angle = normalizedX * 2 * Math.PI;
+                
+                let pointX, pointY;
+                
+                if (isPositive) {
+                    pointX = centerX + radius * Math.cos(angle);
+                    pointY = centerY + radius * Math.sin(angle);
+                } else {
+                    const randomRadius = Math.random() * 30;
+                    const randomAngle = Math.random() * 2 * Math.PI;
+                    pointX = centerX + randomRadius * Math.cos(randomAngle);
+                    pointY = centerY + randomRadius * Math.sin(randomAngle);
+                }
+                
+                const point = document.createElement('div');
+                point.className = `point ${isPositive ? 'zero' : 'one'}`;
+                point.style.left = `${pointX}px`;
+                point.style.top = `${pointY}px`;
+                point.title = `f(${x.toFixed(2)}) = ${y.toFixed(2)}`;
+                point.textContent = isPositive ? '0' : '1';
+                
+                circle.appendChild(point);
+            }
+        }
+        
+        // تحديث الرسم البياني للثماني المخروطي
+        function updateOctaConeChart() {
+            // النقاط الخارجية (6-12)
+            const outerPoints = [];
+            for (let i = 6; i <= 12; i++) {
+                const angle = (i - 6) * (2 * Math.PI / 7);
+                const radius = 7;
+                outerPoints.push({
+                    x: radius * Math.cos(angle),
+                    y: radius * Math.sin(angle)
+                });
+            }
+            
+            // النقاط الداخلية (2-5)
+            const innerPoints = [];
+            for (let i = 2; i <= 5; i++) {
+                const angle = (i - 2) * (2 * Math.PI / 4);
+                const radius = 3;
+                innerPoints.push({
+                    x: radius * Math.cos(angle),
+                    y: radius * Math.sin(angle)
+                });
+            }
+            
+            // النقطة المركزية (1)
+            const centerPoint = [{ x: 0, y: 0 }];
+            
+            // النقطة الخاصة (π=8)
+            const piPoint = [{ x: 0, y: 5 }];
+            
+            // تحديث البيانات
+            if (octaConeChart && octaConeChart.data) {
+                octaConeChart.data.datasets[0].data = outerPoints;
+                octaConeChart.data.datasets[1].data = innerPoints;
+                octaConeChart.data.datasets[2].data = centerPoint;
+                octaConeChart.data.datasets[3].data = piPoint;
+                octaConeChart.update();
+            }
+        }
+        
+        // تمثيل القطوع المخروطية
+        function plotConic(type) {
+            if (!conicChart) {
+                initializeConicChart();
+            }
+            
+            let dataset;
+            
+            switch(type) {
+                case 'circle':
+                    dataset = {
+                        label: 'الدائرة: x² + y² = 25',
+                        data: generateCirclePoints(0, 0, 5),
+                        backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                        borderColor: 'rgb(52, 152, 219)',
+                        pointRadius: 4,
+                        showLine: true,
+                        tension: 0.4
+                    };
+                    break;
+                case 'ellipse':
+                    dataset = {
+                        label: 'القطع الناقص: x²/25 + y²/9 = 1',
+                        data: generateEllipsePoints(0, 0, 5, 3),
+                        backgroundColor: 'rgba(46, 204, 113, 0.7)',
+                        borderColor: 'rgb(46, 204, 113)',
+                        pointRadius: 4,
+                        showLine: true,
+                        tension: 0.4
+                    };
+                    break;
+                case 'parabola':
+                    dataset = {
+                        label: 'القطع المكافئ: y² = 8x',
+                        data: generateParabolaPoints(2, -5, 5),
+                        backgroundColor: 'rgba(155, 89, 182, 0.7)',
+                        borderColor: 'rgb(155, 89, 182)',
+                        pointRadius: 4,
+                        showLine: true,
+                        tension: 0.4
+                    };
+                    break;
+                case 'hyperbola':
+                    dataset = {
+                        label: 'القطع الزائد: x²/9 - y²/4 = 1',
+                        data: generateHyperbolaPoints(3, 2, -8, 8),
+                        backgroundColor: 'rgba(230, 126, 34, 0.7)',
+                        borderColor: 'rgb(230, 126, 34)',
+                        pointRadius: 4,
+                        showLine: true,
+                        tension: 0.4
+                    };
+                    break;
+            }
+            
+            conicChart.data.datasets = [dataset];
+            conicChart.update();
+        }
+        
+        // توليد نقاط الدائرة
+        function generateCirclePoints(h, k, r) {
+            const points = [];
+            for (let angle = 0; angle < 2 * Math.PI; angle += 0.1) {
+                points.push({
+                    x: h + r * Math.cos(angle),
+                    y: k + r * Math.sin(angle)
+                });
+            }
+            return points;
+        }
+        
+        // توليد نقاط القطع الناقص
+        function generateEllipsePoints(h, k, a, b) {
+            const points = [];
+            for (let angle = 0; angle < 2 * Math.PI; angle += 0.1) {
+                points.push({
+                    x: h + a * Math.cos(angle),
+                    y: k + b * Math.sin(angle)
+                });
+            }
+            return points;
+        }
+        
+        // توليد نقاط القطع المكافئ
+        function generateParabolaPoints(p, from, to) {
+            const points = [];
+            for (let x = from; x <= to; x += 0.2) {
+                const y1 = Math.sqrt(4 * p * x);
+                const y2 = -Math.sqrt(4 * p * x);
+                
+                if (!isNaN(y1)) {
+                    points.push({ x: x, y: y1 });
+                }
+                if (!isNaN(y2)) {
+                    points.push({ x: x, y: y2 });
+                }
+            }
+            return points;
+        }
+        
+        // توليد نقاط القطع الزائد
+        function generateHyperbolaPoints(a, b, from, to) {
+            const points = [];
+            
+            for (let x = a; x <= to; x += 0.2) {
+                const y1 = b * Math.sqrt((x*x)/(a*a) - 1);
+                const y2 = -b * Math.sqrt((x*x)/(a*a) - 1);
+                
+                if (!isNaN(y1)) {
+                    points.push({ x: x, y: y1 });
+                    points.push({ x: -x, y: y1 });
+                }
+                if (!isNaN(y2)) {
+                    points.push({ x: x, y: y2 });
+                    points.push({ x: -x, y: y2 });
+                }
+            }
+            
+            return points;
+        }
+        
+        // تهيئة التطبيق عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeFunctionChart();
+            calculateFunction();
+            
+            // جعل النافذة تستجيب لتغيير الحجم
+            window.addEventListener('resize', function() {
+                if (document.getElementById('number-line').classList.contains('active')) {
+                    initNumberLine();
+                }
+            });
+            
+            // إعادة تقديم MathJax
+            if (window.MathJax) {
+                MathJax.typeset();
+            }
+        });
+    </script>
+</body>
+</html>
